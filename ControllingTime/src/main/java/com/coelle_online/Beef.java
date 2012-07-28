@@ -14,7 +14,7 @@ public class Beef {
 
     public Beef(final DateTime expirationDate) {
         //noinspection HardCodedStringLiteral
-        LOG.debug("Creating Beef({})", expirationDate);
+        LOG.trace("Creating Beef({})", expirationDate);
         expiryDate = expirationDate;
     }
 
@@ -25,7 +25,6 @@ public class Beef {
 
     @Override
     public final String toString() {
-        LOG.info("toString() called");
         final String retVal = String.format("Beef{expiryDate=%s}", expiryDate);
         LOG.trace("toString() - {}", retVal);
         return retVal;

@@ -1,20 +1,32 @@
 package com.coelle_online;
 
+import org.hamcrest.core.Is;
 import org.joda.time.DateTime;
+import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-
-/** Description User: coellen Date: 28.07.12 Time: 16:07 */
 public class BeefTest {
+    private static final long TIME_TO_PASS_FOR_EXPIRY = 100L;
+
+    @SuppressWarnings("NestedMethodCall")
     @Test
-    public void shouldBePastItsPrimeWhenExpiryDateIsPast() throws Exception {
-        int timeToPassForExpiry = 100;
+    public final void shouldBePastItsPrimeWhenExpiryDateIsPast() throws Exception {
+        final DateTime now = new DateTime();
+        final DateTime stamp = now.plus(TIME_TO_PASS_FOR_EXPIRY);
+        final Beef beef = new Beef(stamp);
 
-        Beef beef = new Beef(new DateTime().plus(timeToPassForExpiry));
+        Thread.sleep(TIME_TO_PASS_FOR_EXPIRY * 2L); // Sleep? Bleh...
 
-        Thread.sleep(timeToPassForExpiry * 2); // Sleep? Bleh...
+        final boolean actual = beef.isPastItsPrime();
+        Assert.assertThat(actual, Is.is(true));
+    }
 
-        assertTrue(beef.isPastItsPrime());
+    @Test
+    public final void shouldHaveCorrectFormatWhenToStringIsCalled() {
+        final DateTime now = new DateTime();
+        final Beef beef = new Beef(now);
+
+        //noinspection HardCodedStringLiteral,NestedMethodCall,DuplicateStringLiteralInspection
+        Assert.assertThat(beef.toString(), Is.is(String.format("Beef{expiryDate=%s}", now.toString())));
     }
 }
