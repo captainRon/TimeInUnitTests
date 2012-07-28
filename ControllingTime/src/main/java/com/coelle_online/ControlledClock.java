@@ -1,16 +1,16 @@
 package com.coelle_online;
 
-import org.joda.time.DateTime;
+import java.util.Date;
 
 /**
  * Creates a Clock with the timestamp of NOW. Every call to {@link #now} will return the same timestamp until the time
  * is modified by calling {@link #forwardTimeInMillis(long)}.
  */
 public class ControlledClock implements Clock {
-    private DateTime now;
+    private Date now;
 
     public ControlledClock() {
-        now = new DateTime();
+        now = new Date();
     }
 
     /**
@@ -18,12 +18,14 @@ public class ControlledClock implements Clock {
      *         #forwardTimeInMillis(long)}.
      */
     @Override
-    public final DateTime now() {
-        return now.toDateTime();
+    public final Date now() {
+        final long nowTime = now.getTime();
+        return new Date(nowTime);
     }
 
     public void forwardTimeInMillis(final long milliseconds) {
-        now = now.plus(milliseconds);
+        final long nowTime = now.getTime();
+        now = new Date(nowTime + milliseconds);
     }
 
     @Override

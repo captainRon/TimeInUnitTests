@@ -2,9 +2,10 @@ package com.coelle_online;
 
 import com.gargoylesoftware.base.testing.EqualsTester;
 import org.hamcrest.core.Is;
-import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Date;
 
 /**
  * This class contains the tests for {@link Beef#equals}, {@link Beef#hashCode()}
@@ -21,8 +22,8 @@ public class BasicBeefTest {
     @Test
     public final void shouldConformEqualsContract() {
         final Clock clock = new SystemClock();
-        final DateTime testStamp1 = new DateTime();
-        final DateTime testStamp2 = testStamp1.plus(DIFFERENCE_TIME);
+        final Date testStamp1 = new Date();
+        final Date testStamp2 = new Date(testStamp1.getTime() + DIFFERENCE_TIME);
         final Beef objectA = new Beef(clock, testStamp1);
         final Beef objectB = new Beef(clock, testStamp1);
         final Beef objectC = new Beef(clock, testStamp2);
@@ -37,7 +38,7 @@ public class BasicBeefTest {
     @Test
     public final void shouldHaveCorrectFormatWhenToStringIsCalled() {
         final Clock clock = new SystemClock();
-        final DateTime now = new DateTime();
+        final Date now = new Date();
         final Beef beef = new Beef(clock, now);
 
         //noinspection HardCodedStringLiteral,NestedMethodCall,DuplicateStringLiteralInspection

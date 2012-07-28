@@ -1,11 +1,11 @@
 package com.coelle_online;
 
-import org.joda.time.DateTime;
+import java.util.Date;
 
 public class SystemClock implements Clock {
     @Override
-    public final DateTime now() {
-        return new DateTime();
+    public final Date now() {
+        return new Date();
     }
 
     @Override

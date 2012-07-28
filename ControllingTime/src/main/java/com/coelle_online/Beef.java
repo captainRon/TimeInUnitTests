@@ -1,28 +1,28 @@
 package com.coelle_online;
 
-import org.joda.time.DateTime;
-import org.joda.time.ReadableInstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
 
 /**
  * Class of delicious beef which knows if it has passed it's prime...
  */
 public class Beef {
     private static final Logger LOG = LoggerFactory.getLogger(Beef.class);
-    private final DateTime expiryDate;
+    private final Date expiryDate;
     private final Clock clock;
 
-    public Beef(final Clock externalClock, final DateTime expirationDate) {
+    public Beef(final Clock externalClock, final Date expirationDate) {
         //noinspection HardCodedStringLiteral
         LOG.trace("Creating Beef({},{})", externalClock, expirationDate);
         clock = externalClock;
-        expiryDate = expirationDate;
+        expiryDate = new Date(expirationDate.getTime());
     }
 
     public final boolean isPastItsPrime() {
-        final ReadableInstant now = clock.now();
-        return now.isAfter(expiryDate);
+        final Date now = clock.now();
+        return now.after(expiryDate);
     }
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
