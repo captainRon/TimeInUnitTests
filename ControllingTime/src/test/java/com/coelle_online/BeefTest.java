@@ -5,6 +5,9 @@ import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Some basic tests regarding @link Beef.
+ */
 public class BeefTest {
     private static final long TIME_TO_PASS_FOR_EXPIRY = 100L;
 
@@ -19,14 +22,5 @@ public class BeefTest {
 
         final boolean actual = beef.isPastItsPrime();
         Assert.assertThat(actual, Is.is(true));
-    }
-
-    @Test
-    public final void shouldHaveCorrectFormatWhenToStringIsCalled() {
-        final DateTime now = new DateTime();
-        final Beef beef = new Beef(now);
-
-        //noinspection HardCodedStringLiteral,NestedMethodCall,DuplicateStringLiteralInspection
-        Assert.assertThat(beef.toString(), Is.is(String.format("Beef{expiryDate=%s}", now.toString())));
     }
 }

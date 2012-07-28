@@ -23,10 +23,34 @@ public class Beef {
         return now.isAfter(expiryDate);
     }
 
+    @SuppressWarnings("DuplicateStringLiteralInspection")
     @Override
     public final String toString() {
         final String retVal = String.format("Beef{expiryDate=%s}", expiryDate);
         LOG.trace("toString() - {}", retVal);
         return retVal;
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        final boolean retVal;
+        if((obj != null) && (obj.getClass() == this.getClass())) {
+                if (this == obj) {
+                    retVal = true;
+                } else {
+                    @SuppressWarnings("CastToConcreteClass")
+                    final Beef beef = (Beef) obj;
+
+                    retVal = expiryDate.equals(beef.expiryDate);
+                }
+            } else {
+                retVal = false;
+            }
+        return retVal;
+    }
+
+    @Override
+    public final int hashCode() {
+        return expiryDate.hashCode();
     }
 }
