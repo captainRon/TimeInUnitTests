@@ -25,4 +25,18 @@ public class BeefTest {
         final boolean actual = beef.isPastItsPrime();
         Assert.assertThat(actual, Is.is(true));
     }
+
+    @SuppressWarnings("NestedMethodCall")
+    @Test
+    public final void shouldBePastItsPrimeWhenExpiryDateIsPastWithoutSleeping() throws Exception {
+        final DateTime now = new DateTime();
+        final DateTime stamp = now.plus(TIME_TO_PASS_FOR_EXPIRY);
+        final ControlledClock clock = new ControlledClock();
+
+        final Beef beef = new Beef(clock, stamp);
+        clock.forwardTimeInMillis(TIME_TO_PASS_FOR_EXPIRY);
+
+        final boolean actual = beef.isPastItsPrime();
+        Assert.assertThat(actual, Is.is(true));
+    }
 }
