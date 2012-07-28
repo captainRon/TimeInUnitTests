@@ -16,7 +16,9 @@ public class BeefTest {
     public final void shouldBePastItsPrimeWhenExpiryDateIsPast() throws Exception {
         final DateTime now = new DateTime();
         final DateTime stamp = now.plus(TIME_TO_PASS_FOR_EXPIRY);
-        final Beef beef = new Beef(stamp);
+        final Clock clock = new SystemClock();
+
+        final Beef beef = new Beef(clock, stamp);
 
         Thread.sleep(TIME_TO_PASS_FOR_EXPIRY * 2L); // Sleep? Bleh...
 

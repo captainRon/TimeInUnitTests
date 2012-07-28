@@ -11,22 +11,24 @@ import org.slf4j.LoggerFactory;
 public class Beef {
     private static final Logger LOG = LoggerFactory.getLogger(Beef.class);
     private final DateTime expiryDate;
+    private final Clock clock;
 
-    public Beef(final DateTime expirationDate) {
+    public Beef(final Clock externalClock, final DateTime expirationDate) {
         //noinspection HardCodedStringLiteral
-        LOG.trace("Creating Beef({})", expirationDate);
+        LOG.trace("Creating Beef({},{})", externalClock, expirationDate);
+        clock = externalClock;
         expiryDate = expirationDate;
     }
 
     public final boolean isPastItsPrime() {
-        final ReadableInstant now = new DateTime();
+        final ReadableInstant now = clock.now();
         return now.isAfter(expiryDate);
     }
 
     @SuppressWarnings("DuplicateStringLiteralInspection")
     @Override
     public final String toString() {
-        final String retVal = String.format("Beef{expiryDate=%s}", expiryDate);
+        final String retVal = String.format("Beef{clock=%s, expiryDate=%s}", clock, expiryDate);
         LOG.trace("toString() - {}", retVal);
         return retVal;
     }
