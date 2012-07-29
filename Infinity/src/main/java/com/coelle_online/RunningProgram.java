@@ -9,33 +9,48 @@ import sun.misc.SignalHandler;
 @SuppressWarnings("UseOfSunClasses")
 public class RunningProgram {
     /*
-     * It bothered me that the main program had the shutdown hook.
-     * That behaviour definitely felt strongly related to the
-     * RunningCondition. I felt it was a good thing to move it to
-     * the that class.
+     * The difficulty with this class still exists. We cannot modify
+     * the RunningCondition of this program since it creates one for
+     * itself. Since I prefer Constructor Based Dependency Injection,
+     * I’m going to apply Introduce Parameter to Constructor, moving
+     * the field declaration to the constructor itself.
      *
-     * Note that it is now the RunningCondition that now implements
-     * the SignalHandler interface (that we are using to register
-     * with the Signal
+     *
      *
      * [http://www.thekua.com/atwork/2009/02/controlling-time-how-to-deal-with-infinity/]
      */
     private static class RunningCondition implements SignalHandler  {
         private boolean running = true;
 
-        public boolean shouldContinue() {
+        public final boolean shouldContinue() {
             return running;
         }
 
-        public void handle(Signal signal) {
+        @Override
+        public final void handle(final Signal signal) {
             running = false;
+        }
+
+        @Override
+        public final String toString() {
+            //noinspection ChainedMethodCall
+            return new ToStringBuilder(this).
+                    append("running", running).
+                    toString();
         }
     }
 
-    private RunningCondition condition = new RunningCondition();
+    @SuppressWarnings("InstanceVariableOfConcreteClass")
+    private final RunningCondition condition;
 
-    public static void main(String[] args) {
-        final RunningProgram program = new RunningProgram();
+    @SuppressWarnings("MethodParameterOfConcreteClass")
+    public RunningProgram(final RunningCondition runningCondition) {
+        this.condition = runningCondition;
+    }
+
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    public static void main(final String[] args) {
+        final RunningProgram program = new RunningProgram(new RunningCondition());
 
         Signal.handle(new Signal("TERM"), program.condition);
         Signal.handle(new Signal("INT"), program.condition);
