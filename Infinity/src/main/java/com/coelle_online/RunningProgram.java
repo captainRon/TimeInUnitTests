@@ -7,43 +7,38 @@ import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
 @SuppressWarnings("UseOfSunClasses")
-public class RunningProgram implements SignalHandler {
+public class RunningProgram {
     /*
-     * Our first task, was to remove direct access to the running flag
-     * since the class modified it in two places. Sprout an inner class,
-     * and simply delegate to getters and setters.
+     * It bothered me that the main program had the shutdown hook.
+     * That behaviour definitely felt strongly related to the
+     * RunningCondition. I felt it was a good thing to move it to
+     * the that class.
      *
-     * Moving the running flag to a separate class gives us a number of
-     * benefits. It lets us hide the implementation of how we handle
-     * running, and puts us down the road of clearly teasing apart the
-     * overloaded responsibilities.
+     * Note that it is now the RunningCondition that now implements
+     * the SignalHandler interface (that we are using to register
+     * with the Signal
+     *
      * [http://www.thekua.com/atwork/2009/02/controlling-time-how-to-deal-with-infinity/]
      */
-    private static class RunningCondition {
+    private static class RunningCondition implements SignalHandler  {
         private boolean running = true;
 
         public boolean shouldContinue() {
             return running;
         }
 
-        public void stop() {
+        public void handle(Signal signal) {
             running = false;
         }
     }
 
     private RunningCondition condition = new RunningCondition();
 
-    @Override
-    public final void handle(final Signal signal) {
-        // Program terminated by a signal
-        condition.stop();
-    }
-
     public static void main(String[] args) {
         final RunningProgram program = new RunningProgram();
 
-        Signal.handle(new Signal("TERM"), program);
-        Signal.handle(new Signal("INT"), program);
+        Signal.handle(new Signal("TERM"), program.condition);
+        Signal.handle(new Signal("INT"), program.condition);
         program.start();
     }
 
