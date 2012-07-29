@@ -9,19 +9,31 @@ import sun.misc.SignalHandler;
 @SuppressWarnings("UseOfSunClasses")
 public class RunningProgram {
     /*
-     * The difficulty with this class still exists. We cannot modify
-     * the RunningCondition of this program since it creates one for
-     * itself. Since I prefer Constructor Based Dependency Injection,
-     * I’m going to apply Introduce Parameter to Constructor, moving
-     * the field declaration to the constructor itself.
+     * Note that we are still bound to the implementation of the
+     * specific RunLikeADaemonStrategy, so it’s time to apply Extract
+     * Interface, and understand what role that RunLikeADaemonStrategy
+     * has. We chose the name, RunStrategy for the role name, and
+     * to help keep the names more aligned, we ended up renaming
+     * RunLikeADaemonStrategy to RunLikeADaemonStrategy.
      *
-     *
+     * The best thing is that our RunningProgram no longer needs to
+     * know what happens if a terminate or interrupt signal is sent to
+     * the program. With simply a dependency on the RunStrategy we can
+     * know inject a fixed run strategy for tests that we ended up
+     * calling a RunNumberOfTimesStrategy. We also promoted the
+     * specific RunLikeADaemonStrategy to a full class (not an inner
+     * class).
      *
      * [http://www.thekua.com/atwork/2009/02/controlling-time-how-to-deal-with-infinity/]
      */
-    private static class RunningCondition implements SignalHandler  {
+    private interface RunStrategy {
+        boolean shouldContinue();
+    }
+
+    private static class RunLikeADaemonStrategy implements SignalHandler, RunStrategy {
         private boolean running = true;
 
+        @Override
         public final boolean shouldContinue() {
             return running;
         }
@@ -40,20 +52,19 @@ public class RunningProgram {
         }
     }
 
-    @SuppressWarnings("InstanceVariableOfConcreteClass")
-    private final RunningCondition condition;
+    private final RunStrategy condition;
 
-    @SuppressWarnings("MethodParameterOfConcreteClass")
-    public RunningProgram(final RunningCondition runningCondition) {
+    public RunningProgram(final RunStrategy runningCondition) {
         this.condition = runningCondition;
     }
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     public static void main(final String[] args) {
-        final RunningProgram program = new RunningProgram(new RunningCondition());
+        final RunLikeADaemonStrategy strategy = new RunLikeADaemonStrategy();
+        final RunningProgram program = new RunningProgram(strategy);
 
-        Signal.handle(new Signal("TERM"), program.condition);
-        Signal.handle(new Signal("INT"), program.condition);
+        Signal.handle(new Signal("TERM"), strategy); //NON-NLS
+        Signal.handle(new Signal("INT"), strategy); //NON-NLS
         program.start();
     }
 
@@ -81,15 +92,23 @@ public class RunningProgram {
 
     @Override
     public final boolean equals(final Object obj) {
-        if (obj == null) {
-            return false;
+        final boolean retVal;
+        if ((obj != null) && (obj.getClass() == this.getClass())) {
+            if (this == obj) {
+                retVal = true;
+            } else {
+                @SuppressWarnings("CastToConcreteClass")
+                final RunningProgram beef = (RunningProgram) obj;
+
+                //noinspection ChainedMethodCall
+                retVal = new EqualsBuilder()
+                        .append(this.condition, beef.condition)
+                        .isEquals();
+            }
+        } else {
+            retVal = false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final RunningProgram other = (RunningProgram) obj;
-        //noinspection ChainedMethodCall
-        return new EqualsBuilder().append(this.condition, other.condition).isEquals();
+        return retVal;
     }
 
 }
